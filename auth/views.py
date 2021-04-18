@@ -11,10 +11,13 @@ from rest_framework.status import (
     HTTP_200_OK
 )
 from rest_framework.response import Response
+from django.db import models
 
 from django.contrib.auth.models import User
 
 import requests
+
+from userRegistration.models import UserInfo
 
 
 # @csrf_exempt
@@ -35,11 +38,15 @@ def login(request):
     else:
         user = User.objects.create_user(
             username=username, email=username, password=password)
-        print("created new user")
+        print("Created new user")
     if not user:
         return Response({'error': 'Invalid Credentials'}, status=HTTP_404_NOT_FOUND)
     token, _ = Token.objects.get_or_create(user=user)
-    return Response({'token': token.key}, status=HTTP_200_OK)
+    res=UserInfo.objects.filter(email=username)
+    userRegistered = True
+    if(len(res)==0) :
+        userRegistered = False
+    return Response({'token': token.key, 'registered':userRegistered}, status=HTTP_200_OK)
 
 
 @csrf_exempt
