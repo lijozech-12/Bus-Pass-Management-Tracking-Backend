@@ -42,11 +42,14 @@ def login(request):
     if not user:
         return Response({'error': 'Invalid Credentials'}, status=HTTP_404_NOT_FOUND)
     token, _ = Token.objects.get_or_create(user=user)
-    res=UserInfo.objects.filter(email=username)
+    res=UserInfo.objects.filter(email=username).values()
     userRegistered = True
+    userDetails=None
     if(len(res)==0) :
         userRegistered = False
-    return Response({'token': token.key, 'registered':userRegistered}, status=HTTP_200_OK)
+    else:
+        userDetails = res[0]
+    return Response({'token': token.key, 'registered':userRegistered, 'userDetails':userDetails}, status=HTTP_200_OK)
 
 
 @csrf_exempt
