@@ -17,7 +17,7 @@ from django.contrib.auth.models import User
 
 import requests
 
-from userRegistration.models import UserInfo
+from userRegistration.models import UserInfo, BusPass
 
 
 # @csrf_exempt
@@ -45,16 +45,20 @@ def login(request):
     res=UserInfo.objects.filter(email=username).values()
     userRegistered = True
     userDetails=None
+    busPassID=None
     if(len(res)==0) :
         userRegistered = False
     else:
         userDetails = res[0]
-    return Response({'token': token.key, 'registered':userRegistered, 'userDetails':userDetails}, status=HTTP_200_OK)
+        busPassID = BusPass.objects.filter(
+            userID=username).values()[0]['passCode']
+    return Response({'token': token.key, 'registered': userRegistered, 'userDetails': userDetails, 'busPassID': busPassID}, status=HTTP_200_OK)
 
 
 @csrf_exempt
 @api_view(["GET"])
 def sample_api(request):
     print(request.user)
-    data = {'response': "Authentication Success"}
+    data = {'response': "Authentication Success. Logged in as " +
+            str(request.user)}
     return Response(data, status=HTTP_200_OK)
