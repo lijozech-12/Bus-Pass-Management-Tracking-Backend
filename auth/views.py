@@ -59,6 +59,5 @@ def login(request):
 @api_view(["GET"])
 def sample_api(request):
     print(request.user)
-    data = {'response': "Authentication Success. Logged in as " +
-            str(request.user)}
+    data = {'response': "Authentication Success"}
     return Response(data, status=HTTP_200_OK)
