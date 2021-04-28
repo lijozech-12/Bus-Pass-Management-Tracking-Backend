@@ -13,8 +13,20 @@ class UserInfo(models.Model):
         app_label = 'userRegistration'
 
 
+class ConductorInfo(models.Model):
+    firstName = models.CharField(default="", max_length=50)
+    lastName = models.CharField(default="", max_length=50)
+    phoneNo = models.CharField(default="", max_length=50)
+    email = models.EmailField(default="", max_length=254, primary_key=True)
+    verified = models.BooleanField(default=False)
+
+    class Meta:
+        app_label = 'userRegistration'
+
+
 class BusPass(models.Model):
     userID = models.CharField(default="", max_length=50, primary_key=True)
+    user = models.ForeignKey(UserInfo, on_delete=models.CASCADE)
     passCode = models.CharField(default="", max_length=50)
 
     class Meta:
