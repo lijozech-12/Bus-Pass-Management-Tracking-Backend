@@ -9,7 +9,11 @@ from rest_framework.status import (
 )
 from rest_framework.response import Response
 from django.utils.crypto import get_random_string
+from django.http import HttpResponse
 
+
+def home(request):
+    return HttpResponse("Smart bus pass is running")
 
 @api_view(["POST"])
 @permission_classes((AllowAny,))
