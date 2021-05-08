@@ -25,7 +25,9 @@ SECRET_KEY = 'django-insecure-@%+e87%ukj7xbbv*pj&=*u5-_#yr#lj&66nw=$8z$bgxbe6leg
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'https://smart-bus-pass.herokuapp.com/'
+]
 
 
 # Application definition
