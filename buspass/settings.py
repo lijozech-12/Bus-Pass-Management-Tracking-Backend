@@ -26,7 +26,9 @@ SECRET_KEY = 'django-insecure-@%+e87%ukj7xbbv*pj&=*u5-_#yr#lj&66nw=$8z$bgxbe6leg
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'https://smart-bus-pass.herokuapp.com/'
+    'https://smart-bus-pass.herokuapp.com/',
+    '0.0.0.0',
+    '127.0.0.1'
 ]
 
 
