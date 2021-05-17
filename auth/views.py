@@ -13,7 +13,7 @@ from rest_framework.status import (
 from rest_framework.response import Response
 from django.contrib.auth.models import User
 import requests
-from userRegistration.models import UserInfo, BusPass, ConductorInfo
+from userRegistration.models import UserInfo, BusPass, ConductorInfo, UserImage
 
 
 # @csrf_exempt
@@ -22,8 +22,9 @@ from userRegistration.models import UserInfo, BusPass, ConductorInfo
 def login(request):
     user_data = requests.get(
         "https://www.googleapis.com/oauth2/v3/userinfo?access_token="+request.POST["accessToken"]).json()
-    # print(user_data)
+    print(user_data) 
     username = user_data["email"]
+    picture=user_data["picture"]
     password = "topsecretkey"
     if username is None or username == '':
         return Response({'error': 'Operation failed'}, status=HTTP_400_BAD_REQUEST)
@@ -37,6 +38,10 @@ def login(request):
         print("Created new user")
     if not user:
         return Response({'error': 'Invalid Credentials'}, status=HTTP_404_NOT_FOUND)
+    userImg = UserImage()
+    userImg.userID = username
+    userImg.pic = picture
+    userImg.save()
     token, _ = Token.objects.get_or_create(user=user)
     res = UserInfo.objects.filter(email=username).values()
     user_registered = True
@@ -48,7 +53,7 @@ def login(request):
         user_details = res[0]
         bus_pass_id = BusPass.objects.filter(
             userID=username).values()[0]['passCode']
-    return Response({'token': token.key, 'registered': user_registered,
+    return Response({'token': token.key, 'registered': user_registered, 'picture': UserImage.objects.filter(userID=username).values()[0]['pic'],
                      'userDetails': user_details, 'busPassID': bus_pass_id}, status=HTTP_200_OK)
 
 
@@ -59,6 +64,7 @@ def conductor_login(request):
         "https://www.googleapis.com/oauth2/v3/userinfo?access_token="+request.POST["accessToken"]).json()
     # print(user_data)
     username = user_data["email"]
+    picture=user_data["picture"]
     password = "topsecretkey"
     if username is None or username == '':
         return Response({'error': 'Operation failed'}, status=HTTP_400_BAD_REQUEST)
@@ -72,6 +78,10 @@ def conductor_login(request):
         print("Created new user")
     if not conductor:
         return Response({'error': 'Invalid Credentials'}, status=HTTP_404_NOT_FOUND)
+    userImg = UserImage()
+    userImg.userID = username
+    userImg.pic = picture
+    userImg.save()
     token, _ = Token.objects.get_or_create(user=conductor)
     res = ConductorInfo.objects.filter(email=username).values()
     conductor_registered = True
@@ -80,7 +90,7 @@ def conductor_login(request):
         conductor_registered = False
     else:
         conductor_details = res[0]
-    return Response({'token': token.key, 'registered': conductor_registered,
+    return Response({'token': token.key, 'registered': conductor_registered, 'picture': UserImage.objects.filter(userID=username).values()[0]['pic'],
                      'conductorDetails': conductor_details}, status=HTTP_200_OK)
 
 

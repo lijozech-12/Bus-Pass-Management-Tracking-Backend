@@ -1,4 +1,4 @@
-from userRegistration.models import UserInfo, BusPass, ConductorInfo
+from userRegistration.models import UserInfo, BusPass, ConductorInfo, UserImage
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.status import (
@@ -37,8 +37,7 @@ def register_bus_pass(request):
     print(request.user, "has been registered.")
 
     serialized_user_data = UserInfo.objects.filter(email=request.user).values()
-    return Response({"response": "User has been successfully created",
-                     "userData": serialized_user_data, "busPassID": bus_pass.passCode})
+    return Response({"response": "User has been successfully created", "picture" : UserImage.objects.filter(userID=request.user).values()[0]['pic'], "userData": serialized_user_data, "busPassID": bus_pass.passCode})
 
 
 @api_view(["POST"])
@@ -57,7 +56,7 @@ def register_conductor(request):
     print(request.user, "has been registered as a conductor.")
 
     serialized_conductor_data = ConductorInfo.objects.filter(email=request.user).values()
-    return Response({"response": "Conductor has been successfully registered",
+    return Response({"response": "Conductor has been successfully registered","picture" : UserImage.objects.filter(userID=request.user).values()[0]['pic'],
                      "conductorData": serialized_conductor_data})
 
 

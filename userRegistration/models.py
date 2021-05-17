@@ -12,6 +12,9 @@ class UserInfo(models.Model):
     class Meta:
         app_label = 'userRegistration'
 
+class UserImage(models.Model):
+    userID = models.CharField(default="", max_length=50, primary_key=True)
+    pic = models.CharField(default="", max_length=1000)
 
 class ConductorInfo(models.Model):
     firstName = models.CharField(default="", max_length=50)
