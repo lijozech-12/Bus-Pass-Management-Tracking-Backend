@@ -16,6 +16,24 @@ import requests
 from userRegistration.models import UserInfo, BusPass, ConductorInfo, UserImage
 
 
+def getUserDetails(user: User):
+    password = "topsecretkey"
+    print(user, "is the user")
+    user = authenticate(username=user.email, password=password)
+    token, _ = Token.objects.get_or_create(user=user)
+    res = UserInfo.objects.filter(email=user.email).values()
+    user_registered = True
+    user_details = None
+    bus_pass_id = None
+    if len(res) == 0:
+        user_registered = False
+    else:
+        user_details = res[0]
+        bus_pass_id = BusPass.objects.filter(
+            userID=user.email).values()[0]['passCode']
+    return Response({'token': token.key, 'registered': user_registered, 'picture': UserImage.objects.filter(userID=user.email).values()[0]['pic'],
+                     'userDetails': user_details, 'busPassID': bus_pass_id}, status=HTTP_200_OK)
+
 # @csrf_exempt
 @api_view(["POST"])
 @permission_classes((AllowAny,))
@@ -42,19 +60,7 @@ def login(request):
     userImg.userID = username
     userImg.pic = picture
     userImg.save()
-    token, _ = Token.objects.get_or_create(user=user)
-    res = UserInfo.objects.filter(email=username).values()
-    user_registered = True
-    user_details = None
-    bus_pass_id = None
-    if len(res) == 0:
-        user_registered = False
-    else:
-        user_details = res[0]
-        bus_pass_id = BusPass.objects.filter(
-            userID=username).values()[0]['passCode']
-    return Response({'token': token.key, 'registered': user_registered, 'picture': UserImage.objects.filter(userID=username).values()[0]['pic'],
-                     'userDetails': user_details, 'busPassID': bus_pass_id}, status=HTTP_200_OK)
+    return getUserDetails(user)
 
 
 @api_view(["POST"])

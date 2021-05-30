@@ -1,4 +1,5 @@
 from userRegistration.models import UserInfo, BusPass, ConductorInfo, UserImage
+from auth.views import getUserDetails
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.status import (
@@ -10,6 +11,7 @@ from rest_framework.status import (
 from rest_framework.response import Response
 from django.utils.crypto import get_random_string
 from django.http import HttpResponse
+from django.contrib.auth import authenticate
 
 
 def home(request):
@@ -34,11 +36,9 @@ def register_bus_pass(request):
     bus_pass.passCode = get_random_string(20)
     bus_pass.user = user
     bus_pass.save()
-    print(request.user, "has been registered.")
-
-    serialized_user_data = UserInfo.objects.filter(email=request.user).values()
-    return Response({"response": "User has been successfully created", "picture" : UserImage.objects.filter(userID=request.user).values()[0]['pic'], "userData": serialized_user_data, "busPassID": bus_pass.passCode})
-
+    password = "topsecretkey"
+    userObject = authenticate(username=user.email, password=password)
+    return getUserDetails(userObject)
 
 @api_view(["POST"])
 @permission_classes((AllowAny,))
