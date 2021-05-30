@@ -1,5 +1,5 @@
 from userRegistration.models import UserInfo, BusPass, ConductorInfo, UserImage
-from auth.views import getUserDetails
+from auth.views import getUserDetails, getConductorDetails
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.status import (
@@ -53,11 +53,10 @@ def register_conductor(request):
     conductor.email = request.user
     conductor.phoneNo = conductor_data['phoneNo']
     conductor.save()
+    password = "topsecretkey"
     print(request.user, "has been registered as a conductor.")
-
-    serialized_conductor_data = ConductorInfo.objects.filter(email=request.user).values()
-    return Response({"response": "Conductor has been successfully registered","picture" : UserImage.objects.filter(userID=request.user).values()[0]['pic'],
-                     "conductorData": serialized_conductor_data})
+    conductorObject = authenticate(username=conductor.email, password=password)
+    return getConductorDetails(conductorObject)
 
 
 @api_view(["POST"])

@@ -34,6 +34,24 @@ def getUserDetails(user: User):
     return Response({'token': token.key, 'registered': user_registered, 'picture': UserImage.objects.filter(userID=user.email).values()[0]['pic'],
                      'userDetails': user_details, 'busPassID': bus_pass_id}, status=HTTP_200_OK)
 
+
+def getConductorDetails(user: User):
+    password = "topsecretkey"
+    print(user, "is the user")
+    user = authenticate(username=user.email, password=password)
+    token, _ = Token.objects.get_or_create(user=user)
+    res = ConductorInfo.objects.filter(email=user.email).values()
+    conductor_registered = True
+    conductor_details = None
+    if len(res) == 0:
+        conductor_registered = False
+    else:
+        conductor_details = res[0]
+        bus_pass_id = BusPass.objects.filter(
+            userID=user.email).values()[0]['passCode']
+    return Response({'token': token.key, 'registered': conductor_registered, 'picture': UserImage.objects.filter(userID=user.email).values()[0]['pic'],
+                     'conductorDetails': conductor_details}, status=HTTP_200_OK)
+
 # @csrf_exempt
 @api_view(["POST"])
 @permission_classes((AllowAny,))
@@ -88,16 +106,17 @@ def conductor_login(request):
     userImg.userID = username
     userImg.pic = picture
     userImg.save()
-    token, _ = Token.objects.get_or_create(user=conductor)
-    res = ConductorInfo.objects.filter(email=username).values()
-    conductor_registered = True
-    conductor_details = None
-    if len(res) == 0:
-        conductor_registered = False
-    else:
-        conductor_details = res[0]
-    return Response({'token': token.key, 'registered': conductor_registered, 'picture': UserImage.objects.filter(userID=username).values()[0]['pic'],
-                     'conductorDetails': conductor_details}, status=HTTP_200_OK)
+    return getConductorDetails(conductor)
+    # token, _ = Token.objects.get_or_create(user=conductor)
+    # res = ConductorInfo.objects.filter(email=username).values()
+    # conductor_registered = True
+    # conductor_details = None
+    # if len(res) == 0:
+    #     conductor_registered = False
+    # else:
+    #     conductor_details = res[0]
+    # return Response({'token': token.key, 'registered': conductor_registered, 'picture': UserImage.objects.filter(userID=username).values()[0]['pic'],
+    #                  'conductorDetails': conductor_details}, status=HTTP_200_OK)
 
 
 @csrf_exempt
