@@ -16,7 +16,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from auth.views import login, conductor_login, sample_api
-from userRegistration.views import register_bus_pass, verify_bus_pass, register_conductor, home
+from userRegistration.views import register_bus_pass, register_conductor, home
+from functions.views import verify_bus_pass, get_travel_log
 
 urlpatterns = [
     path('', home),
@@ -24,6 +25,7 @@ urlpatterns = [
     path('api/login', login),
     path('api/test', sample_api),
     path('api/user_registration', register_bus_pass),
+    path('api/travelLog', get_travel_log),
     path('api/conductor/verify_pass', verify_bus_pass),
     path('api/conductor/login', conductor_login),
     path('api/conductor/conductor_registration', register_conductor)
