@@ -1,4 +1,4 @@
-from functions.models import TravelInfo
+from functions.models import TravelInfo, LocationData
 from django.shortcuts import render
 
 from userRegistration.models import UserInfo, BusPass, ConductorInfo, UserImage
@@ -24,12 +24,12 @@ import datetime
 def verify_bus_pass(request):
     if not request.user.is_authenticated:
         return Response({'response': "Login as a conductor to verify bus pass"}, status=HTTP_401_UNAUTHORIZED)
-    username = request.data["email"]
-    res = ConductorInfo.objects.filter(email=username).values()
+    res = ConductorInfo.objects.filter(email=request.user).values()
     if len(res) == 0:
         return Response({'response': "Only conductors can verify pass"}, status=HTTP_401_UNAUTHORIZED)
     req_data = request.data
-    bus_pass_data = BusPass.objects.filter(userID=request.user)[0]
+    bus_pass_data = BusPass.objects.filter(userID=req_data["email"])[0]
+    print(req_data['email'],bus_pass_data.userID,req_data['passCode'],bus_pass_data.passCode)
     if req_data['email'] == bus_pass_data.userID and req_data['passCode'] == bus_pass_data.passCode:
         travel_log=TravelInfo()
         travel_log.email = req_data['email']
@@ -54,3 +54,20 @@ def get_travel_log(request):
     travel_log_data = TravelInfo.objects.filter(email=request.user)
     travel_log_data=serialize("json", travel_log_data)
     return HttpResponse(travel_log_data)
+
+
+@api_view(["POST"])
+@permission_classes((AllowAny,))
+def add_location(request):
+    if not request.user.is_authenticated:
+        return Response({'response': "Login as a conductor to add location"}, status=HTTP_401_UNAUTHORIZED)
+    username = request.data["email"]
+    res = ConductorInfo.objects.filter(email=username).values()
+    if len(res) == 0:
+        return Response({'response': "Only conductors can verify pass"}, status=HTTP_401_UNAUTHORIZED)
+    req_data = request.data
+    new_location = LocationData()
+    new_location.xCoordinate = request.data["xCoordinate"]
+    new_location.yCoordinate = request.data["yCoordinate"]
+    new_location.save()
+    return Response({'response': "Location updated"}, status=HTTP_200_OK)
