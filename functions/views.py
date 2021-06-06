@@ -61,12 +61,13 @@ def get_travel_log(request):
 def add_location(request):
     if not request.user.is_authenticated:
         return Response({'response': "Login as a conductor to add location"}, status=HTTP_401_UNAUTHORIZED)
-    username = request.data["email"]
+    username = request.user
     res = ConductorInfo.objects.filter(email=username).values()
     if len(res) == 0:
         return Response({'response': "Only conductors can verify pass"}, status=HTTP_401_UNAUTHORIZED)
     req_data = request.data
     new_location = LocationData()
+    new_location.busID = request.data["busID"]
     new_location.xCoordinate = request.data["xCoordinate"]
     new_location.yCoordinate = request.data["yCoordinate"]
     new_location.save()
