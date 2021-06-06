@@ -72,3 +72,13 @@ def add_location(request):
     new_location.yCoordinate = request.data["yCoordinate"]
     new_location.save()
     return Response({'response': "Location updated"}, status=HTTP_200_OK)
+
+
+@api_view(["POST"])
+@permission_classes((AllowAny,))
+def get_location(request):
+    if not request.user.is_authenticated:
+        return Response({'response': "Login to get location"}, status=HTTP_401_UNAUTHORIZED)
+    req_data = request.data
+    res = LocationData.objects.filter(busID=req_data["busID"]).values()[0]
+    return Response(res, status=HTTP_200_OK)
