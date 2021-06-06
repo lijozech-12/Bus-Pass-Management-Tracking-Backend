@@ -78,8 +78,10 @@ def get_location(request):
     if not request.user.is_authenticated:
         return Response({'response': "Login to get location"}, status=HTTP_401_UNAUTHORIZED)
     req_data = request.data
-    res = LocationData.objects.filter(busID=req_data["busID"]).values()[0]
-    return Response(res, status=HTTP_200_OK)
+    res = LocationData.objects.filter(busID=req_data["busID"]).values()
+    if len(res)==0:
+        return Response([])
+    return Response(res[0], status=HTTP_200_OK)
 
 
 @api_view(["POST"])
