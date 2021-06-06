@@ -1,4 +1,4 @@
-from functions.models import TravelInfo, LocationData
+from functions.models import TravelInfo, LocationData, ComplaintRegister
 from django.shortcuts import render
 
 from userRegistration.models import UserInfo, BusPass, ConductorInfo, UserImage
@@ -50,10 +50,8 @@ def get_travel_log(request):
     res = UserInfo.objects.filter(email=username).values()
     if len(res) == 0:
         return Response({'response': "Invalid user"}, status=HTTP_401_UNAUTHORIZED)
-    req_data = request.data
-    travel_log_data = TravelInfo.objects.filter(email=request.user)
-    travel_log_data=serialize("json", travel_log_data)
-    return HttpResponse(travel_log_data)
+    travel_log_data = TravelInfo.objects.filter(email=request.user).values()
+    return Response(travel_log_data)
 
 
 @api_view(["POST"])
@@ -81,4 +79,27 @@ def get_location(request):
         return Response({'response': "Login to get location"}, status=HTTP_401_UNAUTHORIZED)
     req_data = request.data
     res = LocationData.objects.filter(busID=req_data["busID"]).values()[0]
+    return Response(res, status=HTTP_200_OK)
+
+
+@api_view(["POST"])
+@permission_classes((AllowAny,))
+def report_complaint(request):
+    if not request.user.is_authenticated:
+        return Response({'response': "Login to submit complaint"}, status=HTTP_401_UNAUTHORIZED)
+    req_data = request.data
+    new_complaint = ComplaintRegister()
+    if "busID" in req_data:
+        new_complaint.busID = req_data["busID"]
+    new_complaint.userID = str(request.user)
+    new_complaint.complaint = req_data["complaint"]
+    new_complaint.save()
+    return Response({'response': "Complaint received"}, status=HTTP_200_OK)
+
+@api_view(["GET"])
+@permission_classes((AllowAny,))
+def get_complaints(request):
+    if not request.user.is_authenticated:
+        return Response({'response': "Login to get complaints"}, status=HTTP_401_UNAUTHORIZED)
+    res = ComplaintRegister.objects.filter(userID=str(request.user)).values()
     return Response(res, status=HTTP_200_OK)

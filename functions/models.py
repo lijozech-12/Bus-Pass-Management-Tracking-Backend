@@ -1,4 +1,5 @@
 from django.db import models
+import django
 
 class TravelInfo(models.Model):
     to_Location = models.CharField(default="", max_length=50)
@@ -12,5 +13,11 @@ class LocationData(models.Model):
     busID = models.CharField(default="", max_length=50, primary_key=True)
     xCoordinate = models.CharField(default="", max_length=100)
     yCoordinate = models.CharField(default="", max_length=100)
+    date = models.DateTimeField(auto_now=True)
 
+class ComplaintRegister(models.Model):
+    complaint = models.TextField()
+    busID = models.CharField(default="", max_length=100)
+    userID = models.CharField(default="", max_length=100)
+    date = models.DateTimeField(auto_now=True)
 
