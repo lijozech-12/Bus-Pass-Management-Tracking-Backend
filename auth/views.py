@@ -47,8 +47,6 @@ def getConductorDetails(user: User):
         conductor_registered = False
     else:
         conductor_details = res[0]
-        bus_pass_id = BusPass.objects.filter(
-            userID=user.email).values()[0]['passCode']
     return Response({'token': token.key, 'registered': conductor_registered, 'picture': UserImage.objects.filter(userID=user.email).values()[0]['pic'],
                      'conductorDetails': conductor_details}, status=HTTP_200_OK)
 
