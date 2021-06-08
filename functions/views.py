@@ -105,3 +105,16 @@ def get_complaints(request):
         return Response({'response': "Login to get complaints"}, status=HTTP_401_UNAUTHORIZED)
     res = ComplaintRegister.objects.filter(userID=str(request.user)).values()
     return Response(res, status=HTTP_200_OK)
+
+
+@api_view(["GET"])
+@permission_classes((AllowAny,))
+def refresh_qr(request):
+    if not request.user.is_authenticated:
+        return Response({'response': "Login to refresh QR"}, status=HTTP_401_UNAUTHORIZED)
+    res = BusPass.objects.get(userID=str(request.user))
+    res.passCode = get_random_string(20)
+    res.save()
+    password = "topsecretkey"
+    userObject = authenticate(username=str(request.user), password=password)
+    return getUserDetails(userObject)
