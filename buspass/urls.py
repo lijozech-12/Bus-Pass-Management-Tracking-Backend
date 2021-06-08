@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path
 from auth.views import login, conductor_login, sample_api
 from userRegistration.views import register_bus_pass, register_conductor, home
-from functions.views import verify_bus_pass, get_travel_log, add_location, get_location, report_complaint, get_complaints, refresh_qr
+from functions.views import verify_bus_pass, get_travel_log, add_location, get_location, report_complaint, get_complaints, refresh_qr, add_balance
 
 urlpatterns = [
     path('', home),
@@ -34,4 +34,5 @@ urlpatterns = [
     path('api/report_complaint', report_complaint),
     path('api/get_complaints', get_complaints),
     path('api/refresh_qr', refresh_qr),
+    path('api/add_balance', add_balance),
 ]

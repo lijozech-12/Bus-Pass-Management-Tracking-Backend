@@ -118,3 +118,17 @@ def refresh_qr(request):
     password = "topsecretkey"
     userObject = authenticate(username=str(request.user), password=password)
     return getUserDetails(userObject)
+
+
+@api_view(["POST"])
+@permission_classes((AllowAny,))
+def add_balance(request):
+    if not request.user.is_authenticated:
+        return Response({'response': "Login to refresh QR"}, status=HTTP_401_UNAUTHORIZED)
+    req_data = request.data
+    res = UserInfo.objects.get(email=str(request.user))
+    res.accBalance = res.accBalance + float(req_data)
+    res.save()
+    password = "topsecretkey"
+    userObject = authenticate(username=str(request.user), password=password)
+    return getUserDetails(userObject)
