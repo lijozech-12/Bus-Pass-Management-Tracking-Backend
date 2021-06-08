@@ -8,6 +8,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
     HTTP_401_UNAUTHORIZED,
+    HTTP_402_PAYMENT_REQUIRED,
     HTTP_404_NOT_FOUND,
     HTTP_200_OK
 )
@@ -31,6 +32,11 @@ def verify_bus_pass(request):
     bus_pass_data = BusPass.objects.filter(userID=req_data["email"])[0]
     print(req_data['email'],bus_pass_data.userID,req_data['passCode'],bus_pass_data.passCode)
     if req_data['email'] == bus_pass_data.userID and req_data['passCode'] == bus_pass_data.passCode:
+        user_info_data = UserInfo.objects.filter(email=req_data["email"])[0]
+        if user_info_data.accBalance < 5:
+            return Response({'response': "No balance available"}, status=HTTP_402_PAYMENT_REQUIRED)
+        user_info_data.accBalance = user_info_data.accBalance - 5
+        user_info_data.save()
         travel_log=TravelInfo()
         travel_log.email = req_data['email']
         travel_log.to_Location = req_data['to']
@@ -63,7 +69,6 @@ def add_location(request):
     res = ConductorInfo.objects.filter(email=username).values()
     if len(res) == 0:
         return Response({'response': "Only conductors can verify pass"}, status=HTTP_401_UNAUTHORIZED)
-    req_data = request.data
     new_location = LocationData()
     new_location.busID = request.data["busID"]
     new_location.xCoordinate = request.data["xCoordinate"]
