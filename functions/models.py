@@ -21,3 +21,10 @@ class ComplaintRegister(models.Model):
     userID = models.CharField(default="", max_length=100)
     date = models.DateTimeField(auto_now=True)
 
+class TripInfo(models.Model):
+    busID = models.CharField(default="", max_length=100)
+    conductorID = models.CharField(default="", max_length=100)
+    date = models.DateTimeField(auto_now=True)
+    from_loc = models.CharField(default="", max_length=100)
+    to_loc = models.CharField(default="", max_length=100)
+
